@@ -3,24 +3,36 @@ const element = {
   props: {
     id: 'app',
     style: 'background-color: red;width: 100px;height: 100px',
+    children: [
+      {
+        type: 'TEXT_ELEMENT',
+        props: {
+          nodeValue: 'Hello, world!',
+          children: [],
+        },
+      },
+    ],
   },
 }
 
-const div = document.createElement(element.type)
+// const textElement = {
+//   type: 'TEXT_ELEMENT',
+//   props: {
+//     nodeValue: 'Hello, world!',
+//   },
+// }
 
-Object.keys(element.props).forEach(name => (div[name] = element.props[name]))
+const isProperty = key => key !== 'children'
 
-const textElement = {
-  type: 'TEXT_ELEMENT',
-  props: {
-    nodeValue: 'Hello, world!',
-  },
+function render(element, container) {
+  const dom = element.type === 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(element.type)
+  Object.keys(element.props)
+    .filter(isProperty)
+    .forEach(name => (dom[name] = element.props[name]))
+  container.append(dom)
+  element.props.children.forEach(child => render(child, dom))
+  return dom
 }
-
-const text = document.createTextNode(textElement.props.nodeValue)
-Object.keys(textElement.props).forEach(name => (text[name] = textElement.props[name]))
-
-div.appendChild(text)
 
 const root = document.getElementById('root')
-root.append(div)
+render(element, root)
