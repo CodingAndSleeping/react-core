@@ -9,10 +9,10 @@ import React from './react'
 
 function App() {
   return (
-    <div id='app'>
+    <button id='app' onClick={() => console.log('click')}>
       <span style='color: blue'>11</span>
       <span style='color: blue'>22</span>
-    </div>
+    </button>
   )
 }
 

@@ -18,8 +18,6 @@ function createElement(type, props, ...children) {
   }
 }
 
-const isProperty = key => key !== 'children'
-
 let nextUnitOfWork, wipFiber // 第一个fiber
 
 function render(element, container) {
@@ -80,7 +78,6 @@ function performUnitOfWork(fiber) {
       fiber.dom = createDom(fiber)
     }
   }
-  console.log(fiber)
   const elements = fiber.props.children
   let index = 0
 
@@ -115,12 +112,21 @@ function performUnitOfWork(fiber) {
     nextFiber = nextFiber.parent
   }
 }
-
+const isEvent = key => key.startsWith('on')
+const isProperty = key => key !== 'children' && !isEvent(key)
+const eventType = key => key.toLowerCase().slice(2)
 function createDom(fiber) {
   const dom = fiber.type === 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(fiber.type)
+
   Object.keys(fiber.props)
     .filter(isProperty)
     .forEach(name => (dom[name] = fiber.props[name]))
+
+  Object.keys(fiber.props)
+    .filter(isEvent)
+    .forEach(name => {
+      dom.addEventListener(eventType(name), fiber.props[name])
+    })
 
   return dom
 }
